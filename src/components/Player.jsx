@@ -1,5 +1,5 @@
 import { usePlayerStore } from "@/store/playerStore";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Slider } from "./Slider";
 export const Pause = ({ className }) => (
   <svg
@@ -71,10 +71,33 @@ const CurrentSong = ({ image, title, artists }) => {
     </div>
   );
 };
+const VolumeControl = () => {
+  const volume = usePlayerStore((state) => state.volume);
+  const setVolume = usePlayerStore((state) => state.setVolume);
+
+  return (
+    <div className="flex justify-center gap-x-2">
+      {volume < 0.1 ? <VolumeSilence /> : <Volume />}
+      <Slider
+        defaultValue={[100]}
+        max={100}
+        min={0}
+        value={[volume * 100]}
+        className="w-[95px]"
+        onValueChange={(value) => {
+          const [newVolume] = value;
+          const volumeValue = newVolume / 100;
+          setVolume(volumeValue);
+        }}
+      />
+    </div>
+  );
+};
 
 export function Player() {
-  const { currentMusic, isPlaying, setIsPlaying, setCurrentMusic } =
-    usePlayerStore((state) => state);
+  const { currentMusic, isPlaying, setIsPlaying, volume } = usePlayerStore(
+    (state) => state
+  );
   const audioRef = useRef();
 
   useEffect(() => {
@@ -82,10 +105,15 @@ export function Player() {
   }, [isPlaying]);
 
   useEffect(() => {
+    audioRef.current.volume = volume;
+  }, [volume]);
+
+  useEffect(() => {
     const { song, playlist, songs } = currentMusic;
     if (song) {
       const src = `/music/${playlist?.id}/0${song.id}.mp3`;
       audioRef.current.src = src;
+      audioRef.current.volume = volume;
       audioRef.current.play();
     }
   }, [currentMusic]);
@@ -109,16 +137,7 @@ export function Player() {
       </div>
 
       <div className="grid place-content-center">
-        <Slider
-          defaultValue={[100]}
-          max={100}
-          min={0}
-          className="w-[95px]"
-          onValueChange={(value) => {
-            const [newVolume] = value;
-            audioRef.current.volume = newVolume / 100;
-          }}
-        />
+        <VolumeControl />
       </div>
     </div>
   );
