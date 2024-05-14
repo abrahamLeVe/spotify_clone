@@ -1,4 +1,3 @@
-"use client";
 import { usePlayerStore } from "@/store/playerStore";
 import { useEffect, useRef, useState } from "react";
 import { Slider } from "./ui/Slider";
