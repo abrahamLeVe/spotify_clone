@@ -6,9 +6,10 @@ import SideMenuItem from "./SideMenuItem.astro";
 import SideMenuCard from "./SideMenuCard.astro";
 
 import { playlists } from "@/lib/data";
+import { ScrollArea } from "./ui/ScrollArea";
 ---
 
-<nav class="flex flex-col flex-1 gap-2">
+<nav class="flex flex-col flex-1 gap-2 overflow-y-hidden">
   <div class="bg-[#121212] rounded-lg p-2">
     <ul>
       <SideMenuItem href="/">
@@ -22,13 +23,19 @@ import { playlists } from "@/lib/data";
       </SideMenuItem>
     </ul>
   </div>
-  <div class="bg-[#121212] rounded-lg p-2 flex-1">
-    <ul>
-      <SideMenuItem href="/">
-        <LibraryIcon />
-        Tu biblioteca
-      </SideMenuItem>
+  <ScrollArea
+    className="bg-[#121212] rounded-lg flex-1 overflow-y-auto "
+    client:load
+  >
+    <ul class="relative">
+      <div class="sticky top-0 z-10 bg-[#121212]">
+        <SideMenuItem href="/">
+          <LibraryIcon />
+          Tu biblioteca
+        </SideMenuItem>
+      </div>
+
       {playlists.map((playlist) => <SideMenuCard playlist={playlist} />)}
     </ul>
-  </div>
+  </ScrollArea>
 </nav>
